@@ -93,6 +93,9 @@ function drawScene() {
     //  * clip in 3D
     //  * project to 2D
     //  * draw line
+
+    let TransformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+    console.log(TransformMatrix);
 }
 
 // Get outcode for vertex (parallel view volume)
