@@ -4,26 +4,57 @@ function mat4x4Parallel(prp, srp, vup, clip) {
     let m1 = new Matrix(4,4);
     Mat4x4Translate(m1, -prp.x, -prp.y, -prp.z);
     // 2. rotate VRC such that (u,v,n) align with (x,y,z)
-    
+    let n = prp.subtract(srp);
+    n.normalize;
+    let u = vup.cross(n);
+    u.normalize;
+    let v = n.cross(u);
+    let m2 = new Matrix(4,4)
+    m2.values = [[u.x, u.y, u.z, 0],
+                  [v.x, v.y, v.z, 0],
+                  [n.x, n.y, n.z, 0],
+                  [0, 0, 0, 1]];
     // 3. shear such that CW is on the z-axis
+    let cw = Vector3((clip[0]+clip[1])/2, (clip[2]+clip[3])/2, -clip[4]);
+    let m3 = new Matrix(4,4);
+    Mat4x4ShearXY(m3, -cw.x/cw.z, -cw.y/cw.z);
     // 4. translate near clipping plane to origin
+    let m4 = new Matrix(4,4);
+    Mat4x4Translate(m4, 0, 0, clip[4]);
     // 5. scale such that view volume bounds are ([-1,1], [-1,1], [-1,0])
-
+    let m5 = new Matrix(4,4);
+    Mat4x4Scale(m5, 2/(clip[1]-clip[0]), 2/(clip[3]-clip[2]), 1/clip[5]);
     // ...
-    // let transform = Matrix.multiply([...]);
-    // return transform;
+    let transform = Matrix.multiply([m5,m4,m3,m2,m1]);
+    return transform;
 }
 
 // create a 4x4 matrix to the perspective projection / view matrix
 function mat4x4Perspective(prp, srp, vup, clip) {
     // 1. translate PRP to origin
+    let m1 = new Matrix(4,4);
+    Mat4x4Translate(m1, -prp.x, -prp.y, -prp.z);
     // 2. rotate VRC such that (u,v,n) align with (x,y,z)
+    let n = prp.subtract(srp);
+    n.normalize;
+    let u = vup.cross(n);
+    u.normalize;
+    let v = n.cross(u);
+    let m2 = new Matrix(4,4)
+    m2.values = [[u.x, u.y, u.z, 0],
+                  [v.x, v.y, v.z, 0],
+                  [n.x, n.y, n.z, 0],
+                  [0, 0, 0, 1]];
     // 3. shear such that CW is on the z-axis
+    let cw = Vector3((clip[0]+clip[1])/2, (clip[2]+clip[3])/2, -clip[4]);
+    let m3 = new Matrix(4,4);
+    Mat4x4ShearXY(m3, -cw.x/cw.z, -cw.y/cw.z);
     // 4. scale such that view volume bounds are ([z,-z], [z,-z], [-1,zmin])
-
+    let m4 = new Matrix(4,4);
+    Mat4x4Scale(m4, (2*clip[4])/((clip[1]-clip[0])*clip[5]), (2*clip[4])/((clip[3]-clip[2])*clip[5]), 1/clip[5]);
     // ...
-    // let transform = Matrix.multiply([...]);
-    // return transform;
+    let transform = Matrix.multiply([m4,m3,m2,m1]);
+    return transform;
 }
 
 // create a 4x4 matrix to project a parallel image on the z=0 plane
