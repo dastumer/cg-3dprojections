@@ -5,9 +5,9 @@ function mat4x4Parallel(prp, srp, vup, clip) {
     Mat4x4Translate(m1, -prp.x, -prp.y, -prp.z);
     // 2. rotate VRC such that (u,v,n) align with (x,y,z)
     let n = prp.subtract(srp);
-    n.normalize;
+    n.normalize();
     let u = vup.cross(n);
-    u.normalize;
+    u.normalize();
     let v = n.cross(u);
     let m2 = new Matrix(4,4)
     m2.values = [[u.x, u.y, u.z, 0],
@@ -36,9 +36,9 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     Mat4x4Translate(m1, -prp.x, -prp.y, -prp.z);
     // 2. rotate VRC such that (u,v,n) align with (x,y,z)
     let n = prp.subtract(srp);
-    n.normalize;
+    n.normalize();
     let u = vup.cross(n);
-    u.normalize;
+    u.normalize();
     let v = n.cross(u);
     let m2 = new Matrix(4,4)
     m2.values = [[u.x, u.y, u.z, 0],
@@ -54,11 +54,13 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     Mat4x4Scale(m4, (2*clip[4])/((clip[1]-clip[0])*clip[5]), (2*clip[4])/((clip[3]-clip[2])*clip[5]), 1/clip[5]);
     // ...
     let transform = Matrix.multiply([m4,m3,m2,m1]);
+    /*
     console.log(n);
     console.log(u);
     console.log(v);
     console.log(m2);
     console.log(transform);
+    */
     return transform;
 }
 
