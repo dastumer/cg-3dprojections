@@ -22,13 +22,50 @@ function init() {
     ctx = view.getContext('2d');
 
     // initial scene... feel free to change this
-    scene = {
+    /*scene = {
         view: {
             type: 'perspective',
             prp: Vector3(44, 20, -16),
             srp: Vector3(20, 20, -40),
             vup: Vector3(0, 1, 0),
             clip: [-19, 5, -10, 8, 12, 100]
+        },
+        models: [
+            {
+                type: 'generic',
+                vertices: [
+                    Vector4( 0,  0, -30, 1),
+                    Vector4(20,  0, -30, 1),
+                    Vector4(20, 12, -30, 1),
+                    Vector4(10, 20, -30, 1),
+                    Vector4( 0, 12, -30, 1),
+                    Vector4( 0,  0, -60, 1),
+                    Vector4(20,  0, -60, 1),
+                    Vector4(20, 12, -60, 1),
+                    Vector4(10, 20, -60, 1),
+                    Vector4( 0, 12, -60, 1)
+                ],
+                edges: [
+                    [0, 1, 2, 3, 4, 0],
+                    [5, 6, 7, 8, 9, 5],
+                    [0, 5],
+                    [1, 6],
+                    [2, 7],
+                    [3, 8],
+                    [4, 9]
+                ],
+                matrix: new Matrix(4, 4)
+            }
+        ]
+    };*/
+
+    scene = {
+        view: {
+            type: 'perspective',
+            prp: Vector3(0, 10, -5),
+            srp: Vector3(20, 15, -40),
+            vup: Vector3(1, 1, 0),
+            clip: [-12, 6, -12, 6, 10, 100]
         },
         models: [
             {
@@ -95,7 +132,7 @@ function drawScene() {
     //  * draw line
 
     let TransformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
-    console.log(TransformMatrix);
+    //console.log(TransformMatrix);
 }
 
 // Get outcode for vertex (parallel view volume)

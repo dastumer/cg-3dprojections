@@ -54,6 +54,11 @@ function mat4x4Perspective(prp, srp, vup, clip) {
     Mat4x4Scale(m4, (2*clip[4])/((clip[1]-clip[0])*clip[5]), (2*clip[4])/((clip[3]-clip[2])*clip[5]), 1/clip[5]);
     // ...
     let transform = Matrix.multiply([m4,m3,m2,m1]);
+    console.log(n);
+    console.log(u);
+    console.log(v);
+    console.log(m2);
+    console.log(transform);
     return transform;
 }
 
