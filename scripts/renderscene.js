@@ -62,10 +62,10 @@ function init() {
     scene = {
         view: {
             type: 'perspective',
-            prp: Vector3(0, 10, -5),
-            srp: Vector3(20, 15, -40),
-            vup: Vector3(1, 1, 0),
-            clip: [-12, 6, -12, 6, 10, 100]
+            prp: Vector3(44, 20, -16),
+            srp: Vector3(20, 20, -40),
+            vup: Vector3(0, 1, 0),
+            clip: [-19, 5, -10, 8, 12, 100]
         },
         models: [
             {
@@ -129,9 +129,48 @@ function drawScene() {
     //  * transform to canonical view volume
     //  * clip in 3D
     //  * project to 2D
-    //  * draw line
+    //  * draw line - done
 
-    let TransformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+
+    let transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+    let projectionMatrix = mat4x4MPer();
+
+    scene.models.forEach(model => {
+        //  * transform to canonical view volume 
+        model.matrix = Matrix.multiply([transformMatrix, model.matrix]) // Isn't being used for anything - not sure what its supposed to do
+
+        //  * clip in 3D
+        //  * project to 2D
+        model.vertices = model.vertices.map(vertexPoint => {
+            vertexPoint = Matrix.multiply([projectionMatrix ,vertexPoint]);
+
+            vertexPoint.x = vertexPoint.x/vertexPoint.w;
+            vertexPoint.y = vertexPoint.y/vertexPoint.w;
+            vertexPoint.z = vertexPoint.z/vertexPoint.w;
+            vertexPoint.w = 1;
+
+            return vertexPoint;
+        });
+
+
+
+        //  * draw line
+        /**
+         * Edges property is such that each element of the array has its own array (child)
+         * The numbers of the child array correspond to which elements of the vertex array should be connected in order
+         * ie edges[0] == [a,b,c,a], so connect vertex a to b, b to c, and c to a
+         */
+        model.edges.forEach(edgeList => {
+            for(let i = 0; i < edgeList.length-1; i++) {
+
+                let pointOne = model.vertices[edgeList[i]];
+                let pointTwo = model.vertices[edgeList[i+1]];
+
+                drawLine(pointOne.x *700, pointOne.y*700, pointTwo.x*700, pointTwo.y*700); // manually scaling up for visibility
+            }
+        });
+    });
+
     
 }
 
@@ -273,6 +312,7 @@ function loadNewScene() {
 
 // Draw black 2D line with red endpoints 
 function drawLine(x1, y1, x2, y2) {
+
     ctx.strokeStyle = '#000000';
     ctx.beginPath();
     ctx.moveTo(x1, y1);
