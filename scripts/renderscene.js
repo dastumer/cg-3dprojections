@@ -62,10 +62,10 @@ function init() {
     scene = {
         view: {
             type: 'perspective',
-            prp: Vector3(44, 20, -16),
-            srp: Vector3(20, 20, -40),
-            vup: Vector3(0, 1, 0),
-            clip: [-19, 5, -10, 8, 12, 100]
+            prp: Vector3(0, 10, -5),
+            srp: Vector3(20, 15, -40),
+            vup: Vector3(1, 1, 0),
+            clip: [-12, 6, -12, 6, 10, 100]
         },
         models: [
             {
@@ -125,26 +125,61 @@ function drawScene() {
     console.log(scene);
     
     // TODO: implement drawing here!
+    let transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+    console.log(transformMatrix);
+    let projectionMatrix = mat4x4MPer();
+    //transformMatrix = Matrix.multiply([projectionMatrix, transformMatrix])
+    //console.log(transformMatrix);
     // For each model, for each edge
-    let transformVertices = [];
-    //  * transform to canonical view volume
+    scene.models.forEach(model => {
+        //  * transform to canonical view volume
+        let transformVertices = []; //Holds the new transformed vertices of the model
+        model.vertices.forEach(vertexPoint => {
+            newVertex = Matrix.multiply([transformMatrix,model.matrix,vertexPoint]);
+            newVertex.x = newVertex.x/newVertex.w;
+            newVertex.y = newVertex.y/newVertex.w;
+            transformVertices.push(newVertex);
+        });
+        //TODO: Make view window scale/translate matrix
+        /**
+         * Edges property is such that each element of the array has its own array (child)
+         * The numbers of the child array correspond to which elements of the vertex array should be connected in order
+         * ie edges[0] == [a,b,c,a], so connect vertex a to b, b to c, and c to a
+         */
+         model.edges.forEach(edgeList => {
+            for(let i = 0; i < edgeList.length-1; i++) {
+
+                let pointOne = transformVertices[edgeList[i]];
+                let pointTwo = transformVertices[edgeList[i+1]];
+                //  * clip in 3D
+
+                 //  * project to 2D
+                newVertex = Matrix.multiply([projectionMatrix, pointOne]);
+                newVertex.x = newVertex.x/newVertex.w;
+                newVertex.y = newVertex.y/newVertex.w;
+                newVertex1 = Matrix.multiply([projectionMatrix, pointTwo]);
+                newVertex1.x = newVertex1.x/newVertex1.w;
+                newVertex1.y = newVertex1.y/newVertex1.w;
+                //  * draw line
+                drawLine(newVertex.x*view.height/2+view.width/2, newVertex.y*view.height/2+view.height/2, newVertex1.x*view.height/2+view.width/2, newVertex1.y*view.height/2+view.height/2); // Adjusting scale so it fits in view window
+            }
+        });
+    });
     
-    //  * clip in 3D
-    //  * project to 2D
-    //  * draw line - done
-
-
+}
+//Storing Joe's code
+function foo(){
     let transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
     let projectionMatrix = mat4x4MPer();
 
     scene.models.forEach(model => {
         //  * transform to canonical view volume 
-        model.matrix = Matrix.multiply([transformMatrix, model.matrix]) // Isn't being used for anything - not sure what its supposed to do
+        
 
         //  * clip in 3D
         //  * project to 2D
         model.vertices = model.vertices.map(vertexPoint => {
-            vertexPoint = Matrix.multiply([projectionMatrix ,vertexPoint]);
+            vertexPoint = Matrix.multiply([projectionMatrix, transformMatrix, vertexPoint]);
 
             vertexPoint.x = vertexPoint.x/vertexPoint.w;
             vertexPoint.y = vertexPoint.y/vertexPoint.w;
@@ -172,8 +207,6 @@ function drawScene() {
             }
         });
     });
-
-    
 }
 
 // Get outcode for vertex (parallel view volume)
