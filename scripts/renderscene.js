@@ -126,7 +126,9 @@ function drawScene() {
     
     // TODO: implement drawing here!
     // For each model, for each edge
+    let transformVertices = [];
     //  * transform to canonical view volume
+    
     //  * clip in 3D
     //  * project to 2D
     //  * draw line
