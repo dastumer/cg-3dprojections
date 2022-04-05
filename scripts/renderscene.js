@@ -106,6 +106,10 @@ function init() {
 
 // Animation loop - repeatedly calls rendering code
 function animate(timestamp) {
+
+    // Clears Previously drawn frame
+    ctx.clearRect(0, 0, view.width, view.height);
+
     // step 1: calculate time (time since start)
     let time = timestamp - start_time;
     
@@ -117,14 +121,14 @@ function animate(timestamp) {
 
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
-    // window.requestAnimationFrame(animate);
+
+    //window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
 function drawScene() {
     console.log(scene);
     
-    // TODO: implement drawing here!
     let transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
     console.log(transformMatrix);
     let projectionMatrix = mat4x4MPer();
@@ -167,47 +171,7 @@ function drawScene() {
     });
     
 }
-//Storing Joe's code
-function foo(){
-    let transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
-    let projectionMatrix = mat4x4MPer();
 
-    scene.models.forEach(model => {
-        //  * transform to canonical view volume 
-        
-
-        //  * clip in 3D
-        //  * project to 2D
-        model.vertices = model.vertices.map(vertexPoint => {
-            vertexPoint = Matrix.multiply([projectionMatrix, transformMatrix, vertexPoint]);
-
-            vertexPoint.x = vertexPoint.x/vertexPoint.w;
-            vertexPoint.y = vertexPoint.y/vertexPoint.w;
-            vertexPoint.z = vertexPoint.z/vertexPoint.w;
-            vertexPoint.w = 1;
-
-            return vertexPoint;
-        });
-
-
-
-        //  * draw line
-        /**
-         * Edges property is such that each element of the array has its own array (child)
-         * The numbers of the child array correspond to which elements of the vertex array should be connected in order
-         * ie edges[0] == [a,b,c,a], so connect vertex a to b, b to c, and c to a
-         */
-        model.edges.forEach(edgeList => {
-            for(let i = 0; i < edgeList.length-1; i++) {
-
-                let pointOne = model.vertices[edgeList[i]];
-                let pointTwo = model.vertices[edgeList[i+1]];
-
-                drawLine(pointOne.x *700, pointOne.y*700, pointTwo.x*700, pointTwo.y*700); // manually scaling up for visibility
-            }
-        });
-    });
-}
 
 // Get outcode for vertex (parallel view volume)
 function outcodeParallel(vertex) {
@@ -283,26 +247,51 @@ function clipLinePerspective(line, z_min) {
     return result;
 }
 
+
 // Called when user presses a key on the keyboard down 
 function onKeyDown(event) {
+
+    let nUnit = scene.view.prp.subtract(scene.view.srp);
+    nUnit.normalize();
+
+    let uUnit = scene.view.vup.cross(nUnit);
+    uUnit.normalize();
+
     switch (event.keyCode) {
         case 37: // LEFT Arrow
             console.log("left");
+
             break;
         case 39: // RIGHT Arrow
             console.log("right");
             break;
         case 65: // A key
             console.log("A");
+
+            scene.view.prp = scene.view.prp.add(uUnit);
+            scene.view.srp = scene.view.srp.add(uUnit);
+
             break;
         case 68: // D key
             console.log("D");
+
+            scene.view.prp = scene.view.prp.subtract(uUnit);
+            scene.view.srp = scene.view.srp.subtract(uUnit);
+
             break;
         case 83: // S key
             console.log("S");
+
+            scene.view.prp = scene.view.prp.subtract(nUnit);
+            scene.view.srp = scene.view.srp.subtract(nUnit);
+
             break;
         case 87: // W key
             console.log("W");
+            
+            scene.view.prp = scene.view.prp.add(nUnit);
+            scene.view.srp = scene.view.srp.add(nUnit);
+
             break;
     }
 }
