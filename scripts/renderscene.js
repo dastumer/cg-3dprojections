@@ -182,6 +182,7 @@ function drawScene() {
         projectionMatrix = mat4x4MPar();
     }
     
+    console.log(scene.models[0].vertices);
     
     // For each model, for each edge
     scene.models.forEach(model => {
@@ -208,16 +209,8 @@ function drawScene() {
                 let pointOne = transformedVertices[edgeList[i+1]];
 
                 let line = {
-                    pt0: {
-                        x: pointZero.x,
-                        y: pointZero.y,
-                        z: pointZero.z
-                    },
-                    pt1: {
-                        x: pointOne.x,
-                        y: pointOne.y,
-                        z: pointOne.z
-                    }
+                    pt0: Vector4(pointZero.x, pointZero.y, pointZero.z, 1),
+                    pt1: Vector4(pointOne.x, pointOne.y, pointOne.z, 1)
                 }
 
                 //  * clip in 3D
@@ -227,22 +220,17 @@ function drawScene() {
                     line = clipLineParallel(line);
                 }
 
-                if(line == null) {continue;} // Skips current iteration of loop if there is no line to draw
+                console.log(line);
 
-                // Alter points Zero and One based on clipping
-                pointZero.x = line.pt0.x;
-                pointZero.y = line.pt0.y;
-                pointZero.z = line.pt0.z;
-                pointOne.x = line.pt1.x;
-                pointOne.y = line.pt1.y;
-                pointOne.z = line.pt1.z;
+
+                if(line == null) {continue;} // Skips current iteration of loop if there is no line to draw
 
 
                 //  * project to 2D
-                newVertex = Matrix.multiply([windowMatrix, projectionMatrix, pointZero]);
+                newVertex = Matrix.multiply([windowMatrix, projectionMatrix, line.pt0]);
                 newVertex.x = newVertex.x/newVertex.w;
                 newVertex.y = newVertex.y/newVertex.w;
-                newVertex1 = Matrix.multiply([windowMatrix, projectionMatrix, pointOne]);
+                newVertex1 = Matrix.multiply([windowMatrix, projectionMatrix, line.pt1]);
                 newVertex1.x = newVertex1.x/newVertex1.w;
                 newVertex1.y = newVertex1.y/newVertex1.w;
 
@@ -252,6 +240,8 @@ function drawScene() {
 
             }
         });
+        console.log(scene.models[0].vertices);
+
     });
     
 }
@@ -320,7 +310,12 @@ function clipLineParallel(line) {
 
 // Clip line - should either return a new line (with two endpoints inside view volume) or null (if line is completely outside view volume)
 function clipLinePerspective(line, z_min) {
-    let result = line;
+
+    let result = {
+        pt0: Vector4(line.pt0.x, line.pt0.y, line.pt0.z, 1),
+        pt1: Vector4(line.pt1.x, line.pt1.y, line.pt1.z, 1)
+    };
+
     let p0 = Vector3(line.pt0.x, line.pt0.y, line.pt0.z); 
     let p1 = Vector3(line.pt1.x, line.pt1.y, line.pt1.z);
     let out0 = outcodePerspective(p0, z_min);
