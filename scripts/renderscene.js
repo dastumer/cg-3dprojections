@@ -108,7 +108,7 @@ function init() {
             {
                 type: 'generic',
                 vertices: [
-                    Vector4( -15,  0, -30, 1),
+                    Vector4( -10,  0, -30, 1),
                     Vector4(10,  0, -30, 1),
                     Vector4(10, 12, -30, 1),
                     Vector4(0, 20, -30, 1),
@@ -120,7 +120,13 @@ function init() {
                     Vector4( -10, 12, -60, 1)
                 ],
                 edges: [
-                    [0, 1]
+                    [0, 1, 2, 3, 4, 0],
+                    [5, 6, 7, 8, 9, 5],
+                    [0, 5],
+                    [1, 6],
+                    [2, 7],
+                    [3, 8],
+                    [4, 9]
                 ],
                 matrix: new Matrix(4, 4)
             }
@@ -221,8 +227,6 @@ function drawScene() {
                     line = clipLineParallel(line);
                 }
 
-                console.log(line);
-
                 if(line == null) {continue;} // Skips current iteration of loop if there is no line to draw
 
                 // Alter points Zero and One based on clipping
@@ -232,8 +236,6 @@ function drawScene() {
                 pointOne.x = line.pt1.x;
                 pointOne.y = line.pt1.y;
                 pointOne.z = line.pt1.z;
-
-                console.log(line);
 
 
                 //  * project to 2D
@@ -248,7 +250,6 @@ function drawScene() {
                 //drawLine(newVertex.x*view.height/2+view.width/2, newVertex.y*view.height/2+view.height/2, newVertex1.x*view.height/2+view.width/2, newVertex1.y*view.height/2+view.height/2); // Adjusting scale so it fits in view window
                 drawLine(newVertex.x, newVertex.y, newVertex1.x, newVertex1.y);
 
-                console.log("drawScene ~ newVertex.x, newVertex.y, newVertex1.x, newVertex1.y", newVertex.x, newVertex.y, newVertex1.x, newVertex1.y);
             }
         });
     });
@@ -340,20 +341,16 @@ function clipLinePerspective(line, z_min) {
         trivialAccept = out0 | out1;
 
         if(trivialReject != 0) { // Trivial Rejection, both points are outside same edge, line is clipped, return null
-            console.log("reject", out0);
-
             return null;
         }
 
         // Vars
-        let xDelta = p0.x - p1.x;
-        let yDelta = p0.y - p1.y;
-        let zDelta = p0.z - p1.z;
+        let xDelta = p1.x - p0.x;
+        let yDelta = p1.y - p0.y;
+        let zDelta = p1.z - p0.z;
 
         let outcode;
         let point;
-
-        console.log("clipLinePerspective ~ out0 ~ out1", out0, out1);
 
         if(out0 != 0) {
             outcode = out0;
@@ -441,8 +438,6 @@ function findNewEndpointPerspective(x0,x1,xDelta,y0,y1,yDelta,z0,z1,zDelta,z_min
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     }
-
-    console.log(" ~ point", point);
     return point;
 }
 
