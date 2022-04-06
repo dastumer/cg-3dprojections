@@ -59,65 +59,28 @@ function init() {
     //     ]
     // };
 
-    // scene = {
-    //     view: {
-    //         type: 'perspective',
-    //         prp: Vector3(0, 10, -5),
-    //         srp: Vector3(20, 15, -40),
-    //         vup: Vector3(1, 1, 0),
-    //         clip: [-12, 6, -12, 6, 10, 100]
-    //     },
-    //     models: [
-    //         {
-    //             type: 'generic',
-    //             vertices: [
-    //                 Vector4( 0,  0, -30, 1),
-    //                 Vector4(20,  0, -30, 1),
-    //                 Vector4(20, 12, -30, 1),
-    //                 Vector4(10, 20, -30, 1),
-    //                 Vector4( 0, 12, -30, 1),
-    //                 Vector4( 0,  0, -60, 1),
-    //                 Vector4(20,  0, -60, 1),
-    //                 Vector4(20, 12, -60, 1),
-    //                 Vector4(10, 20, -60, 1),
-    //                 Vector4( 0, 12, -60, 1)
-    //             ],
-    //             edges: [
-    //                 [0, 1, 2, 3, 4, 0],
-    //                 [5, 6, 7, 8, 9, 5],
-    //                 [0, 5],
-    //                 [1, 6],
-    //                 [2, 7],
-    //                 [3, 8],
-    //                 [4, 9]
-    //             ],
-    //             matrix: new Matrix(4, 4)
-    //         }
-    //     ]
-    // };
-
     scene = {
         view: {
             type: 'perspective',
-            prp: Vector3(10, 9, 0),
-            srp: Vector3(10, 9, -30),
-            vup: Vector3(0, 1, 0),
-            clip: [-11, 11, -11, 11, 30, 100]
+            prp: Vector3(0, 10, -5),
+            srp: Vector3(20, 15, -40),
+            vup: Vector3(1, 1, 0),
+            clip: [-12, 6, -12, 6, 10, 100]
         },
         models: [
             {
                 type: 'generic',
                 vertices: [
-                    Vector4( -10,  0, -30, 1),
-                    Vector4(10,  0, -30, 1),
-                    Vector4(10, 12, -30, 1),
-                    Vector4(0, 20, -30, 1),
-                    Vector4( -10, 12, -30, 1),
-                    Vector4( -10,  0, -60, 1),
-                    Vector4(10,  0, -60, 1),
-                    Vector4(10, 12, -60, 1),
-                    Vector4(0, 20, -60, 1),
-                    Vector4( -10, 12, -60, 1)
+                    Vector4( 0,  0, -30, 1),
+                    Vector4(20,  0, -30, 1),
+                    Vector4(20, 12, -30, 1),
+                    Vector4(10, 20, -30, 1),
+                    Vector4( 0, 12, -30, 1),
+                    Vector4( 0,  0, -60, 1),
+                    Vector4(20,  0, -60, 1),
+                    Vector4(20, 12, -60, 1),
+                    Vector4(10, 20, -60, 1),
+                    Vector4( 0, 12, -60, 1)
                 ],
                 edges: [
                     [0, 1, 2, 3, 4, 0],
@@ -132,6 +95,7 @@ function init() {
             }
         ]
     };
+
 
     // event handler for pressing arrow keys
     document.addEventListener('keydown', onKeyDown, false);
@@ -297,15 +261,66 @@ function outcodePerspective(vertex, z_min) {
 
 // Clip line - should either return a new line (with two endpoints inside view volume) or null (if line is completely outside view volume)
 function clipLineParallel(line) {
-    let result = null;
+
+    let result = {
+        pt0: Vector4(line.pt0.x, line.pt0.y, line.pt0.z, 1),
+        pt1: Vector4(line.pt1.x, line.pt1.y, line.pt1.z, 1)
+    };
+
     let p0 = Vector3(line.pt0.x, line.pt0.y, line.pt0.z); 
     let p1 = Vector3(line.pt1.x, line.pt1.y, line.pt1.z);
     let out0 = outcodeParallel(p0);
     let out1 = outcodeParallel(p1);
-    
-    // TODO: implement clipping here!
-    
-    return result;
+
+    let trivialReject = out0 & out1;
+    let trivialAccept = out0 | out1;
+
+
+    while(trivialAccept != 0) {
+
+        // Recalculate
+        p0 = Vector3(result.pt0.x, result.pt0.y, result.pt0.z); 
+        p1 = Vector3(result.pt1.x, result.pt1.y, result.pt1.z);
+        out0 = outcodeParallel(p0, z_min);
+        out1 = outcodeParallel(p1, z_min);
+        trivialReject = out0 & out1;
+        trivialAccept = out0 | out1;
+
+        if(trivialReject != 0) { // Trivial Rejection, both points are outside same edge, line is clipped, return null
+            return null;
+        }
+
+        // Vars
+        let xDelta = p1.x - p0.x;
+        let yDelta = p1.y - p0.y;
+        let zDelta = p1.z - p0.z;
+
+        let outcode;
+        let point;
+
+        if(out0 != 0) {
+            outcode = out0;
+            point = {x: p0.x, y: p0.y, z: p0.z};
+        } else {
+            outcode = out1;
+            point = {x: p1.x, y: p1.y, z: p1.z};
+        }
+
+        point = findNewEndpointParallel(p0.x, p1.x, xDelta, p0.y, p1.y, yDelta, p0.z, p1.z, zDelta, z_min, outcode, point);
+
+
+        // Modify return value
+        if(out0 != 0) {
+            result.pt0.x = point.x;
+            result.pt0.y = point.y;
+            result.pt0.z = point.z;
+        } else {
+            result.pt1.x = point.x;
+            result.pt1.y = point.y;
+            result.pt1.z = point.z;
+        }
+    }
+    return result
 }
 
 // Clip line - should either return a new line (with two endpoints inside view volume) or null (if line is completely outside view volume)
@@ -383,7 +398,64 @@ function parametricEquation(t, var0, var1) {
  * 
  * this accounts for all of the possible alterations needed for perspective line clipping
  */
-function findNewEndpointPerspective(x0,x1,xDelta,y0,y1,yDelta,z0,z1,zDelta,z_min, outcode, point) {
+ function findNewEndpointParallel(x0, x1, xDelta, y0, y1, yDelta, z0, z1, zDelta, outcode, point) {
+
+    let t; // shorthand only, value changes regularly
+
+    // bitwise comparisons need to be set beforehand for some reason
+    bitwiseWithLeft = outcode & LEFT;
+    bitwiseWithRight = outcode & RIGHT;
+    bitwiseWithBottom = outcode & BOTTOM;
+    bitwiseWithTop = outcode & TOP;
+    bitwiseWithFar = outcode & FAR;
+    bitwiseWithNear = outcode & NEAR;
+
+
+    if(bitwiseWithLeft == LEFT) { // Clip against the left plane
+        console.log('left');
+        t = ((-1 * x0) + z0) / (xDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithRight == RIGHT) { // Clip against the right plane
+        console.log('right');
+        t = (x0 + z0) / (-xDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithBottom == BOTTOM) { // Clip against the bottom plane
+        console.log('bottom');
+        t = (-y0 + z0) / (yDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithTop == TOP) { // Clip against the top plane
+        console.log('top');
+        t = (y0 + z0) / (-yDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithFar == FAR) { // Clip against the far plane
+        console.log('far');
+        t = (z0 - z_min) / -zDelta;
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithNear == NEAR) { // Clip against the near plane
+        console.log('near');
+        t = (-z0 - 1) / zDelta;
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    }
+    return point;
+}
+
+/**
+ * 
+ * this accounts for all of the possible alterations needed for perspective line clipping
+ */
+function findNewEndpointPerspective(x0, x1, xDelta, y0, y1, yDelta, z0, z1, zDelta, z_min, outcode, point) {
 
     let t; // shorthand only, value changes regularly
 

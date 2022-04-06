@@ -5,7 +5,7 @@ TODO:
 * Perspective
 //
 * [x] Transform
-* [] Clipping
+* [x] Clipping
 * [x] Projection
 * [x] Draw Lines
 * [x] WASD Movement
@@ -17,7 +17,7 @@ TODO:
 * [] Clipping
 * [x] Projection
 * [x] Draw Lines
-* [?] WASD Movement
+* [x] WASD Movement
 * [] Arrow Key Rotation
 //
 * [] Common Models
@@ -28,4 +28,4 @@ TODO:
 //
 
 Bugs:
-* Parallel WASD Movement, specifically W and S, *might* be behaving incorrectly, not sure
+* Near/Far perspective clipping doesn't work correctly
