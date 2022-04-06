@@ -129,21 +129,31 @@ function animate(timestamp) {
 function drawScene() {
     console.log(scene);
     
-    let transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
-    console.log(transformMatrix);
-    let projectionMatrix = mat4x4MPer();
-    //transformMatrix = Matrix.multiply([projectionMatrix, transformMatrix])
-    //console.log(transformMatrix);
+    let transformMatrix;
+    let projectionMatrix;
+
+    if(scene.view.type == 'perspective') {
+        transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+        projectionMatrix = mat4x4MPer();
+    } else {
+        transformMatrix = mat4x4Parallel(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
+        projectionMatrix = mat4x4MPar();
+    }
+    
+
+    
     // For each model, for each edge
     scene.models.forEach(model => {
         //  * transform to canonical view volume
-        let transformVertices = []; //Holds the new transformed vertices of the model
+        let transformedVertices = []; //Holds the new transformed vertices of the model
         model.vertices.forEach(vertexPoint => {
             newVertex = Matrix.multiply([transformMatrix,model.matrix,vertexPoint]);
             newVertex.x = newVertex.x/newVertex.w;
             newVertex.y = newVertex.y/newVertex.w;
-            transformVertices.push(newVertex);
+            transformedVertices.push(newVertex);
         });
+
+
         //TODO: Make view window scale/translate matrix
         /**
          * Edges property is such that each element of the array has its own array (child)
@@ -153,8 +163,8 @@ function drawScene() {
          model.edges.forEach(edgeList => {
             for(let i = 0; i < edgeList.length-1; i++) {
 
-                let pointOne = transformVertices[edgeList[i]];
-                let pointTwo = transformVertices[edgeList[i+1]];
+                let pointOne = transformedVertices[edgeList[i]];
+                let pointTwo = transformedVertices[edgeList[i+1]];
                 //  * clip in 3D
 
                  //  * project to 2D

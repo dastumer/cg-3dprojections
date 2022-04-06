@@ -1,3 +1,30 @@
 # 3D Projections for Wireframe Rendering
 
-3D Projections starter code using the HTML5 Canvas 2D API
+TODO:
+
+* Perspective
+
+* [x] Transform
+* [] Clipping
+* [x] Projection
+* [x] Draw Lines
+* [x] WASD Movement
+* [] Arrow Key Rotation
+
+* Parallel
+
+* [x] Transform
+* [] Clipping
+* [x] Projection
+* [x] Draw Lines
+* [?] WASD Movement
+* [] Arrow Key Rotation
+
+* [] Common Models
+
+* [] Model Rotation
+
+
+
+Bugs:
+* Parallel WASD Movement, specifically W and S, *might* be behaving incorrectly, not sure
