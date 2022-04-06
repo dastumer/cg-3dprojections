@@ -22,7 +22,7 @@ function init() {
     ctx = view.getContext('2d');
 
     // initial scene... feel free to change this
-    /*scene = {
+    scene = {
         view: {
             type: 'perspective',
             prp: Vector3(44, 20, -16),
@@ -57,9 +57,9 @@ function init() {
                 matrix: new Matrix(4, 4)
             }
         ]
-    };*/
+    };
 
-    scene = {
+    /*scene = {
         view: {
             type: 'perspective',
             prp: Vector3(0, 10, -5),
@@ -94,7 +94,7 @@ function init() {
                 matrix: new Matrix(4, 4)
             }
         ]
-    };
+    };*/
 
     // event handler for pressing arrow keys
     document.addEventListener('keydown', onKeyDown, false);
@@ -122,7 +122,7 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    //window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
@@ -131,6 +131,11 @@ function drawScene() {
     
     let transformMatrix;
     let projectionMatrix;
+    let windowMatrix = new Matrix(4, 4);
+    windowMatrix.values = [[view.width/2, 0, 0, view.width/2],
+                  [0, view.height/2, 0, view.height/2],
+                  [0, 0, 1, 0],
+                  [0, 0, 0, 1]];
 
     if(scene.view.type == 'perspective') {
         transformMatrix = mat4x4Perspective(scene.view.prp, scene.view.srp, scene.view.vup, scene.view.clip);
@@ -154,7 +159,6 @@ function drawScene() {
         });
 
 
-        //TODO: Make view window scale/translate matrix
         /**
          * Edges property is such that each element of the array has its own array (child)
          * The numbers of the child array correspond to which elements of the vertex array should be connected in order
@@ -168,14 +172,15 @@ function drawScene() {
                 //  * clip in 3D
 
                  //  * project to 2D
-                newVertex = Matrix.multiply([projectionMatrix, pointOne]);
+                newVertex = Matrix.multiply([windowMatrix, projectionMatrix, pointOne]);
                 newVertex.x = newVertex.x/newVertex.w;
                 newVertex.y = newVertex.y/newVertex.w;
-                newVertex1 = Matrix.multiply([projectionMatrix, pointTwo]);
+                newVertex1 = Matrix.multiply([windowMatrix, projectionMatrix, pointTwo]);
                 newVertex1.x = newVertex1.x/newVertex1.w;
                 newVertex1.y = newVertex1.y/newVertex1.w;
                 //  * draw line
-                drawLine(newVertex.x*view.height/2+view.width/2, newVertex.y*view.height/2+view.height/2, newVertex1.x*view.height/2+view.width/2, newVertex1.y*view.height/2+view.height/2); // Adjusting scale so it fits in view window
+                //drawLine(newVertex.x*view.height/2+view.width/2, newVertex.y*view.height/2+view.height/2, newVertex1.x*view.height/2+view.width/2, newVertex1.y*view.height/2+view.height/2); // Adjusting scale so it fits in view window
+                drawLine(newVertex.x, newVertex.y, newVertex1.x, newVertex1.y);
             }
         });
     });
@@ -278,29 +283,29 @@ function onKeyDown(event) {
         case 65: // A key
             console.log("A");
 
-            scene.view.prp = scene.view.prp.add(uUnit);
-            scene.view.srp = scene.view.srp.add(uUnit);
+            scene.view.prp = scene.view.prp.subtract(uUnit);
+            scene.view.srp = scene.view.srp.subtract(uUnit);
 
             break;
         case 68: // D key
             console.log("D");
 
-            scene.view.prp = scene.view.prp.subtract(uUnit);
-            scene.view.srp = scene.view.srp.subtract(uUnit);
+            scene.view.prp = scene.view.prp.add(uUnit);
+            scene.view.srp = scene.view.srp.add(uUnit);
 
             break;
         case 83: // S key
             console.log("S");
 
-            scene.view.prp = scene.view.prp.subtract(nUnit);
-            scene.view.srp = scene.view.srp.subtract(nUnit);
+            scene.view.prp = scene.view.prp.add(nUnit);
+            scene.view.srp = scene.view.srp.add(nUnit);
 
             break;
         case 87: // W key
             console.log("W");
-            
-            scene.view.prp = scene.view.prp.add(nUnit);
-            scene.view.srp = scene.view.srp.add(nUnit);
+
+            scene.view.prp = scene.view.prp.subtract(nUnit);
+            scene.view.srp = scene.view.srp.subtract(nUnit);
 
             break;
     }
