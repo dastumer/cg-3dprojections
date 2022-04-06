@@ -22,79 +22,110 @@ function init() {
     ctx = view.getContext('2d');
 
     // initial scene... feel free to change this
+    // scene = {
+    //     view: {
+    //         type: 'perspective',
+    //         prp: Vector3(44, 20, -16),
+    //         srp: Vector3(20, 20, -40),
+    //         vup: Vector3(0, 1, 0),
+    //         clip: [-19, 5, -10, 8, 12, 100]
+    //     },
+    //     models: [
+    //         {
+    //             type: 'generic',
+    //             vertices: [
+    //                 Vector4( 0,  0, -30, 1),
+    //                 Vector4(20,  0, -30, 1),
+    //                 Vector4(20, 12, -30, 1),
+    //                 Vector4(10, 20, -30, 1),
+    //                 Vector4( 0, 12, -30, 1),
+    //                 Vector4( 0,  0, -60, 1),
+    //                 Vector4(20,  0, -60, 1),
+    //                 Vector4(20, 12, -60, 1),
+    //                 Vector4(10, 20, -60, 1),
+    //                 Vector4( 0, 12, -60, 1)
+    //             ],
+    //             edges: [
+    //                 [0, 1, 2, 3, 4, 0],
+    //                 [5, 6, 7, 8, 9, 5],
+    //                 [0, 5],
+    //                 [1, 6],
+    //                 [2, 7],
+    //                 [3, 8],
+    //                 [4, 9]
+    //             ],
+    //             matrix: new Matrix(4, 4)
+    //         }
+    //     ]
+    // };
+
+    // scene = {
+    //     view: {
+    //         type: 'perspective',
+    //         prp: Vector3(0, 10, -5),
+    //         srp: Vector3(20, 15, -40),
+    //         vup: Vector3(1, 1, 0),
+    //         clip: [-12, 6, -12, 6, 10, 100]
+    //     },
+    //     models: [
+    //         {
+    //             type: 'generic',
+    //             vertices: [
+    //                 Vector4( 0,  0, -30, 1),
+    //                 Vector4(20,  0, -30, 1),
+    //                 Vector4(20, 12, -30, 1),
+    //                 Vector4(10, 20, -30, 1),
+    //                 Vector4( 0, 12, -30, 1),
+    //                 Vector4( 0,  0, -60, 1),
+    //                 Vector4(20,  0, -60, 1),
+    //                 Vector4(20, 12, -60, 1),
+    //                 Vector4(10, 20, -60, 1),
+    //                 Vector4( 0, 12, -60, 1)
+    //             ],
+    //             edges: [
+    //                 [0, 1, 2, 3, 4, 0],
+    //                 [5, 6, 7, 8, 9, 5],
+    //                 [0, 5],
+    //                 [1, 6],
+    //                 [2, 7],
+    //                 [3, 8],
+    //                 [4, 9]
+    //             ],
+    //             matrix: new Matrix(4, 4)
+    //         }
+    //     ]
+    // };
+
     scene = {
         view: {
             type: 'perspective',
-            prp: Vector3(44, 20, -16),
-            srp: Vector3(20, 20, -40),
+            prp: Vector3(10, 9, 0),
+            srp: Vector3(10, 9, -30),
             vup: Vector3(0, 1, 0),
-            clip: [-19, 5, -10, 8, 12, 100]
+            clip: [-11, 11, -11, 11, 30, 100]
         },
         models: [
             {
                 type: 'generic',
                 vertices: [
-                    Vector4( 0,  0, -30, 1),
-                    Vector4(20,  0, -30, 1),
-                    Vector4(20, 12, -30, 1),
-                    Vector4(10, 20, -30, 1),
-                    Vector4( 0, 12, -30, 1),
-                    Vector4( 0,  0, -60, 1),
-                    Vector4(20,  0, -60, 1),
-                    Vector4(20, 12, -60, 1),
-                    Vector4(10, 20, -60, 1),
-                    Vector4( 0, 12, -60, 1)
+                    Vector4( -15,  0, -30, 1),
+                    Vector4(10,  0, -30, 1),
+                    Vector4(10, 12, -30, 1),
+                    Vector4(0, 20, -30, 1),
+                    Vector4( -10, 12, -30, 1),
+                    Vector4( -10,  0, -60, 1),
+                    Vector4(10,  0, -60, 1),
+                    Vector4(10, 12, -60, 1),
+                    Vector4(0, 20, -60, 1),
+                    Vector4( -10, 12, -60, 1)
                 ],
                 edges: [
-                    [0, 1, 2, 3, 4, 0],
-                    [5, 6, 7, 8, 9, 5],
-                    [0, 5],
-                    [1, 6],
-                    [2, 7],
-                    [3, 8],
-                    [4, 9]
+                    [0, 1]
                 ],
                 matrix: new Matrix(4, 4)
             }
         ]
     };
-
-    /*scene = {
-        view: {
-            type: 'perspective',
-            prp: Vector3(0, 10, -5),
-            srp: Vector3(20, 15, -40),
-            vup: Vector3(1, 1, 0),
-            clip: [-12, 6, -12, 6, 10, 100]
-        },
-        models: [
-            {
-                type: 'generic',
-                vertices: [
-                    Vector4( 0,  0, -30, 1),
-                    Vector4(20,  0, -30, 1),
-                    Vector4(20, 12, -30, 1),
-                    Vector4(10, 20, -30, 1),
-                    Vector4( 0, 12, -30, 1),
-                    Vector4( 0,  0, -60, 1),
-                    Vector4(20,  0, -60, 1),
-                    Vector4(20, 12, -60, 1),
-                    Vector4(10, 20, -60, 1),
-                    Vector4( 0, 12, -60, 1)
-                ],
-                edges: [
-                    [0, 1, 2, 3, 4, 0],
-                    [5, 6, 7, 8, 9, 5],
-                    [0, 5],
-                    [1, 6],
-                    [2, 7],
-                    [3, 8],
-                    [4, 9]
-                ],
-                matrix: new Matrix(4, 4)
-            }
-        ]
-    };*/
 
     // event handler for pressing arrow keys
     document.addEventListener('keydown', onKeyDown, false);
@@ -122,12 +153,12 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    window.requestAnimationFrame(animate);
+    //window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
 function drawScene() {
-    console.log(scene);
+    //console.log(scene);
     
     let transformMatrix;
     let projectionMatrix;
@@ -145,10 +176,10 @@ function drawScene() {
         projectionMatrix = mat4x4MPar();
     }
     
-
     
     // For each model, for each edge
     scene.models.forEach(model => {
+
         //  * transform to canonical view volume
         let transformedVertices = []; //Holds the new transformed vertices of the model
         model.vertices.forEach(vertexPoint => {
@@ -167,20 +198,57 @@ function drawScene() {
          model.edges.forEach(edgeList => {
             for(let i = 0; i < edgeList.length-1; i++) {
 
-                let pointOne = transformedVertices[edgeList[i]];
-                let pointTwo = transformedVertices[edgeList[i+1]];
-                //  * clip in 3D
+                let pointZero = transformedVertices[edgeList[i]];
+                let pointOne = transformedVertices[edgeList[i+1]];
 
-                 //  * project to 2D
-                newVertex = Matrix.multiply([windowMatrix, projectionMatrix, pointOne]);
+                let line = {
+                    pt0: {
+                        x: pointZero.x,
+                        y: pointZero.y,
+                        z: pointZero.z
+                    },
+                    pt1: {
+                        x: pointOne.x,
+                        y: pointOne.y,
+                        z: pointOne.z
+                    }
+                }
+
+                //  * clip in 3D
+                if(scene.view.type == 'perspective') {
+                    line = clipLinePerspective(line, -1*(scene.view.clip[4]/scene.view.clip[5]));
+                } else {
+                    line = clipLineParallel(line);
+                }
+
+                console.log(line);
+
+                if(line == null) {continue;} // Skips current iteration of loop if there is no line to draw
+
+                // Alter points Zero and One based on clipping
+                pointZero.x = line.pt0.x;
+                pointZero.y = line.pt0.y;
+                pointZero.z = line.pt0.z;
+                pointOne.x = line.pt1.x;
+                pointOne.y = line.pt1.y;
+                pointOne.z = line.pt1.z;
+
+                console.log(line);
+
+
+                //  * project to 2D
+                newVertex = Matrix.multiply([windowMatrix, projectionMatrix, pointZero]);
                 newVertex.x = newVertex.x/newVertex.w;
                 newVertex.y = newVertex.y/newVertex.w;
-                newVertex1 = Matrix.multiply([windowMatrix, projectionMatrix, pointTwo]);
+                newVertex1 = Matrix.multiply([windowMatrix, projectionMatrix, pointOne]);
                 newVertex1.x = newVertex1.x/newVertex1.w;
                 newVertex1.y = newVertex1.y/newVertex1.w;
+
                 //  * draw line
                 //drawLine(newVertex.x*view.height/2+view.width/2, newVertex.y*view.height/2+view.height/2, newVertex1.x*view.height/2+view.width/2, newVertex1.y*view.height/2+view.height/2); // Adjusting scale so it fits in view window
                 drawLine(newVertex.x, newVertex.y, newVertex1.x, newVertex1.y);
+
+                console.log("drawScene ~ newVertex.x, newVertex.y, newVertex1.x, newVertex1.y", newVertex.x, newVertex.y, newVertex1.x, newVertex1.y);
             }
         });
     });
@@ -251,15 +319,131 @@ function clipLineParallel(line) {
 
 // Clip line - should either return a new line (with two endpoints inside view volume) or null (if line is completely outside view volume)
 function clipLinePerspective(line, z_min) {
-    let result = null;
+    let result = line;
     let p0 = Vector3(line.pt0.x, line.pt0.y, line.pt0.z); 
     let p1 = Vector3(line.pt1.x, line.pt1.y, line.pt1.z);
     let out0 = outcodePerspective(p0, z_min);
     let out1 = outcodePerspective(p1, z_min);
-    
-    // TODO: implement clipping here!
-    
-    return result;
+
+    let trivialReject = out0 & out1;
+    let trivialAccept = out0 | out1;
+
+
+    while(trivialAccept != 0) {
+
+        // Recalculate
+        p0 = Vector3(result.pt0.x, result.pt0.y, result.pt0.z); 
+        p1 = Vector3(result.pt1.x, result.pt1.y, result.pt1.z);
+        out0 = outcodePerspective(p0, z_min);
+        out1 = outcodePerspective(p1, z_min);
+        trivialReject = out0 & out1;
+        trivialAccept = out0 | out1;
+
+        if(trivialReject != 0) { // Trivial Rejection, both points are outside same edge, line is clipped, return null
+            console.log("reject", out0);
+
+            return null;
+        }
+
+        // Vars
+        let xDelta = p0.x - p1.x;
+        let yDelta = p0.y - p1.y;
+        let zDelta = p0.z - p1.z;
+
+        let outcode;
+        let point;
+
+        console.log("clipLinePerspective ~ out0 ~ out1", out0, out1);
+
+        if(out0 != 0) {
+            outcode = out0;
+            point = {x: p0.x, y: p0.y, z: p0.z};
+        } else {
+            outcode = out1;
+            point = {x: p1.x, y: p1.y, z: p1.z};
+        }
+
+        point = findNewEndpointPerspective(p0.x, p1.x, xDelta, p0.y, p1.y, yDelta, p0.z, p1.z, zDelta, z_min, outcode, point);
+
+
+        // Modify return value
+        if(out0 != 0) {
+            result.pt0.x = point.x;
+            result.pt0.y = point.y;
+            result.pt0.z = point.z;
+        } else {
+            result.pt1.x = point.x;
+            result.pt1.y = point.y;
+            result.pt1.z = point.z;
+        }
+    }
+    return result
+}
+
+/**
+ * The parametric equation for finding points on a line
+ */
+function parametricEquation(t, var0, var1) {    
+    return ((1 - t) * var0) + (t * var1);
+}
+
+/**
+ * 
+ * this accounts for all of the possible alterations needed for perspective line clipping
+ */
+function findNewEndpointPerspective(x0,x1,xDelta,y0,y1,yDelta,z0,z1,zDelta,z_min, outcode, point) {
+
+    let t; // shorthand only, value changes regularly
+
+    // bitwise comparisons need to be set beforehand for some reason
+    bitwiseWithLeft = outcode & LEFT;
+    bitwiseWithRight = outcode & RIGHT;
+    bitwiseWithBottom = outcode & BOTTOM;
+    bitwiseWithTop = outcode & TOP;
+    bitwiseWithFar = outcode & FAR;
+    bitwiseWithNear = outcode & NEAR;
+
+
+    if(bitwiseWithLeft == LEFT) { // Clip against the left plane
+        console.log('left');
+        t = ((-1 * x0) + z0) / (xDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithRight == RIGHT) { // Clip against the right plane
+        console.log('right');
+        t = (x0 + z0) / (-xDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithBottom == BOTTOM) { // Clip against the bottom plane
+        console.log('bottom');
+        t = (-y0 + z0) / (yDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithTop == TOP) { // Clip against the top plane
+        console.log('top');
+        t = (y0 + z0) / (-yDelta - zDelta);
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithFar == FAR) { // Clip against the far plane
+        console.log('far');
+        t = (z0 - z_min) / -zDelta;
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    } else if(bitwiseWithNear == NEAR) { // Clip against the near plane
+        console.log('near');
+        t = (-z0 - 1) / zDelta;
+        point.x = parametricEquation(t,x0,x1);
+        point.y = parametricEquation(t,y0,y1);
+        point.z = parametricEquation(t,z0,z1);
+    }
+
+    console.log(" ~ point", point);
+    return point;
 }
 
 
@@ -303,7 +487,7 @@ function onKeyDown(event) {
             break;
         case 87: // W key
             console.log("W");
-
+            
             scene.view.prp = scene.view.prp.subtract(nUnit);
             scene.view.srp = scene.view.srp.subtract(nUnit);
 
