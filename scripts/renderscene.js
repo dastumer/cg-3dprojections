@@ -97,6 +97,8 @@ function init() {
     };
 
 
+
+
     // event handler for pressing arrow keys
     document.addEventListener('keydown', onKeyDown, false);
     
@@ -123,12 +125,12 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    //window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
 function drawScene() {
-    //console.log(scene);
+    console.log(scene);
     
     let transformMatrix;
     let projectionMatrix;
@@ -146,7 +148,6 @@ function drawScene() {
         projectionMatrix = mat4x4MPar();
     }
     
-    console.log(scene.models[0].vertices);
     
     // For each model, for each edge
     scene.models.forEach(model => {
@@ -184,8 +185,6 @@ function drawScene() {
                     line = clipLineParallel(line);
                 }
 
-                console.log(line);
-
 
                 if(line == null) {continue;} // Skips current iteration of loop if there is no line to draw
 
@@ -199,13 +198,10 @@ function drawScene() {
                 newVertex1.y = newVertex1.y/newVertex1.w;
 
                 //  * draw line
-                //drawLine(newVertex.x*view.height/2+view.width/2, newVertex.y*view.height/2+view.height/2, newVertex1.x*view.height/2+view.width/2, newVertex1.y*view.height/2+view.height/2); // Adjusting scale so it fits in view window
                 drawLine(newVertex.x, newVertex.y, newVertex1.x, newVertex1.y);
 
             }
         });
-        console.log(scene.models[0].vertices);
-
     });
     
 }
@@ -281,8 +277,8 @@ function clipLineParallel(line) {
         // Recalculate
         p0 = Vector3(result.pt0.x, result.pt0.y, result.pt0.z); 
         p1 = Vector3(result.pt1.x, result.pt1.y, result.pt1.z);
-        out0 = outcodeParallel(p0, z_min);
-        out1 = outcodeParallel(p1, z_min);
+        out0 = outcodeParallel(p0);
+        out1 = outcodeParallel(p1);
         trivialReject = out0 & out1;
         trivialAccept = out0 | out1;
 
@@ -306,7 +302,7 @@ function clipLineParallel(line) {
             point = {x: p1.x, y: p1.y, z: p1.z};
         }
 
-        point = findNewEndpointParallel(p0.x, p1.x, xDelta, p0.y, p1.y, yDelta, p0.z, p1.z, zDelta, z_min, outcode, point);
+        point = findNewEndpointParallel(p0.x, p1.x, xDelta, p0.y, p1.y, yDelta, p0.z, p1.z, zDelta, outcode, point);
 
 
         // Modify return value
@@ -412,38 +408,38 @@ function parametricEquation(t, var0, var1) {
 
 
     if(bitwiseWithLeft == LEFT) { // Clip against the left plane
-        console.log('left');
-        t = ((-1 * x0) + z0) / (xDelta - zDelta);
+        //console.log('left');
+        t = (-1 - x0) / xDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithRight == RIGHT) { // Clip against the right plane
-        console.log('right');
-        t = (x0 + z0) / (-xDelta - zDelta);
+        //console.log('right');
+        t = (1 - x0) / xDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithBottom == BOTTOM) { // Clip against the bottom plane
-        console.log('bottom');
-        t = (-y0 + z0) / (yDelta - zDelta);
+        //console.log('bottom');
+        t = (-1 - y0) / yDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithTop == TOP) { // Clip against the top plane
-        console.log('top');
-        t = (y0 + z0) / (-yDelta - zDelta);
+        //console.log('top');
+        t = (1 - y0) / yDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithFar == FAR) { // Clip against the far plane
-        console.log('far');
-        t = (z0 - z_min) / -zDelta;
+        //console.log('far');
+        t = (-z0 - 1) / zDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithNear == NEAR) { // Clip against the near plane
-        console.log('near');
-        t = (-z0 - 1) / zDelta;
+        //console.log('near');
+        t = -z0 / zDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
@@ -469,38 +465,32 @@ function findNewEndpointPerspective(x0, x1, xDelta, y0, y1, yDelta, z0, z1, zDel
 
 
     if(bitwiseWithLeft == LEFT) { // Clip against the left plane
-        console.log('left');
         t = ((-1 * x0) + z0) / (xDelta - zDelta);
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithRight == RIGHT) { // Clip against the right plane
-        console.log('right');
         t = (x0 + z0) / (-xDelta - zDelta);
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithBottom == BOTTOM) { // Clip against the bottom plane
-        console.log('bottom');
         t = (-y0 + z0) / (yDelta - zDelta);
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithTop == TOP) { // Clip against the top plane
-        console.log('top');
         t = (y0 + z0) / (-yDelta - zDelta);
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithFar == FAR) { // Clip against the far plane
-        console.log('far');
-        t = (z0 - z_min) / -zDelta;
+        t = (-z0 - 1) / zDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
     } else if(bitwiseWithNear == NEAR) { // Clip against the near plane
-        console.log('near');
-        t = (-z0 - 1) / zDelta;
+        t = (z0 - z_min) / -zDelta;
         point.x = parametricEquation(t,x0,x1);
         point.y = parametricEquation(t,y0,y1);
         point.z = parametricEquation(t,z0,z1);
@@ -525,34 +515,23 @@ function onKeyDown(event) {
             break;
         case 39: // RIGHT Arrow
             console.log("right");
+
             break;
         case 65: // A key
-            console.log("A");
-
             scene.view.prp = scene.view.prp.subtract(uUnit);
             scene.view.srp = scene.view.srp.subtract(uUnit);
-
             break;
         case 68: // D key
-            console.log("D");
-
             scene.view.prp = scene.view.prp.add(uUnit);
             scene.view.srp = scene.view.srp.add(uUnit);
-
             break;
         case 83: // S key
-            console.log("S");
-
             scene.view.prp = scene.view.prp.add(nUnit);
             scene.view.srp = scene.view.srp.add(nUnit);
-
             break;
-        case 87: // W key
-            console.log("W");
-            
+        case 87: // W key            
             scene.view.prp = scene.view.prp.subtract(nUnit);
             scene.view.srp = scene.view.srp.subtract(nUnit);
-
             break;
     }
 }

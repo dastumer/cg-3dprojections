@@ -14,7 +14,7 @@ TODO:
 * Parallel
 //
 * [x] Transform
-* [] Clipping
+* [x] Clipping
 * [x] Projection
 * [x] Draw Lines
 * [x] WASD Movement
@@ -28,4 +28,4 @@ TODO:
 //
 
 Bugs:
-* Near/Far perspective clipping doesn't work correctly
+* None
