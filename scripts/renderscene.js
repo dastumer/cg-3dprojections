@@ -22,50 +22,13 @@ function init() {
     ctx = view.getContext('2d');
 
     // initial scene... feel free to change this
-    // scene = {
-    //     view: {
-    //         type: 'perspective',
-    //         prp: Vector3(44, 20, -16),
-    //         srp: Vector3(20, 20, -40),
-    //         vup: Vector3(0, 1, 0),
-    //         clip: [-19, 5, -10, 8, 12, 100]
-    //     },
-    //     models: [
-    //         {
-    //             type: 'generic',
-    //             vertices: [
-    //                 Vector4( 0,  0, -30, 1),
-    //                 Vector4(20,  0, -30, 1),
-    //                 Vector4(20, 12, -30, 1),
-    //                 Vector4(10, 20, -30, 1),
-    //                 Vector4( 0, 12, -30, 1),
-    //                 Vector4( 0,  0, -60, 1),
-    //                 Vector4(20,  0, -60, 1),
-    //                 Vector4(20, 12, -60, 1),
-    //                 Vector4(10, 20, -60, 1),
-    //                 Vector4( 0, 12, -60, 1)
-    //             ],
-    //             edges: [
-    //                 [0, 1, 2, 3, 4, 0],
-    //                 [5, 6, 7, 8, 9, 5],
-    //                 [0, 5],
-    //                 [1, 6],
-    //                 [2, 7],
-    //                 [3, 8],
-    //                 [4, 9]
-    //             ],
-    //             matrix: new Matrix(4, 4)
-    //         }
-    //     ]
-    // };
-
     scene = {
         view: {
             type: 'perspective',
-            prp: Vector3(0, 10, -5),
-            srp: Vector3(20, 15, -40),
-            vup: Vector3(1, 1, 0),
-            clip: [-12, 6, -12, 6, 10, 100]
+            prp: Vector3(44, 20, -16),
+            srp: Vector3(20, 20, -40),
+            vup: Vector3(0, 1, 0),
+            clip: [-19, 5, -10, 8, 12, 100]
         },
         models: [
             {
@@ -96,9 +59,6 @@ function init() {
         ]
     };
 
-
-
-
     // event handler for pressing arrow keys
     document.addEventListener('keydown', onKeyDown, false);
     
@@ -125,7 +85,7 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    window.requestAnimationFrame(animate);
+    //window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
@@ -508,13 +468,32 @@ function onKeyDown(event) {
     let uUnit = scene.view.vup.cross(nUnit);
     uUnit.normalize();
 
+    let vUnit = nUnit.cross(uUnit);
+    let theta = Math.PI/8;
+    let rotationMatrix = new Matrix(3,3);
+
     switch (event.keyCode) {
         case 37: // LEFT Arrow
             console.log("left");
 
+            rotationMatrix.values = [[Math.cos(theta)+Math.pow(vUnit.x,2)*(1-Math.cos(theta)), vUnit.x*vUnit.y*(1-Math.cos(theta))-vUnit.z*Math.sin(theta), vUnit.x*vUnit.z*(1-Math.cos(theta))+vUnit.y*Math.sin(theta)],
+                                    [vUnit.y*vUnit.x*(1-Math.cos(theta))+vUnit.z*Math.sin(theta), Math.cos(theta)+Math.pow(vUnit.y,2)*(1-Math.cos(theta)), vUnit.y*vUnit.z*(1-Math.cos(theta))-vUnit.x*Math.sin(theta)],
+                                    [vUnit.z*vUnit.x*(1-Math.cos(theta))-vUnit.y*Math.sin(theta), vUnit.z*vUnit.y*(1-Math.cos(theta))+vUnit.x*Math.sin(theta), Math.cos(theta)+Math.pow(vUnit.z,2)*(1-Math.cos(theta))]];
+            
+            //scene.view.prp = Matrix.multiply([rotationMatrix, scene.view.prp]);
+            scene.view.srp = Matrix.multiply([rotationMatrix, scene.view.srp]);
+
             break;
         case 39: // RIGHT Arrow
             console.log("right");
+
+            theta = -theta;
+            rotationMatrix.values = [[Math.cos(theta)+Math.pow(vUnit.x,2)*(1-Math.cos(theta)), vUnit.x*vUnit.y*(1-Math.cos(theta))-vUnit.z*Math.sin(theta), vUnit.x*vUnit.z*(1-Math.cos(theta))+vUnit.y*Math.sin(theta)],
+                                    [vUnit.y*vUnit.x*(1-Math.cos(theta))+vUnit.z*Math.sin(theta), Math.cos(theta)+Math.pow(vUnit.y,2)*(1-Math.cos(theta)), vUnit.y*vUnit.z*(1-Math.cos(theta))-vUnit.x*Math.sin(theta)],
+                                    [vUnit.z*vUnit.x*(1-Math.cos(theta))-vUnit.y*Math.sin(theta), vUnit.z*vUnit.y*(1-Math.cos(theta))+vUnit.x*Math.sin(theta), Math.cos(theta)+Math.pow(vUnit.z,2)*(1-Math.cos(theta))]];
+            
+            //scene.view.prp = Matrix.multiply([rotationMatrix, scene.view.prp]);
+            scene.view.srp = Matrix.multiply([rotationMatrix, scene.view.srp]);
 
             break;
         case 65: // A key
@@ -536,6 +515,59 @@ function onKeyDown(event) {
     }
 }
 
+/**
+ * Generates vertices and edges for non-generic model types
+ */
+function generateGenericModels() {
+    console.log(scene);
+    for (let j = 0; j < scene.models.length; j++) {
+        console.log("generic models loop");
+        console.log(j);
+        console.log(scene.models.length);
+        console.log(scene.models[j].type);
+        if (scene.models[j].type === 'cube') {
+            let vertices = [];
+            let edges = [];
+            for (let i = 0; i < 8; i++) { //Make 8 points at cube's center
+                vertices[i] = Vector4(scene.models[j].center.x, scene.models[j].center.y, scene.models[j].center.z, 1);
+            }
+            for (i = 0; i < 4; i++) { //Lower first 4 points to bottom y of cube
+                vertices[i] = vertices[i].subtract(Vector4(0, scene.models[j].height / 2, 0, 0));
+            }
+            for (i = 4; i < 8; i++) { //Raise last 4 points to top y of cube
+                vertices[i] = vertices[i].add(Vector4(0, scene.models[j].height / 2, 0, 0));
+            }
+            let pointlist = [0, 1, 4, 5];
+            for (i = 0; i < 4; i++) { //Shift left 4 points to left x of cube
+                vertices[pointlist[i]] = vertices[pointlist[i]].subtract(Vector4(scene.models[j].width / 2, 0, 0, 0));
+            }
+            pointlist = [2, 3, 6, 7];
+            for (i = 0; i < 4; i++) { //Shift left 4 points to left x of cube
+                vertices[pointlist[i]] = vertices[pointlist[i]].add(Vector4(scene.models[j].width / 2, 0, 0, 0));
+            }
+            pointlist = [0, 3, 4, 7];
+            for (i = 0; i < 4; i++) { //Shift front 4 points to front z of cube
+                vertices[pointlist[i]] = vertices[pointlist[i]].subtract(Vector4(0, 0, scene.models[j].depth / 2, 0));
+            }
+            pointlist = [1, 2, 5, 6];
+            for (i = 0; i < 4; i++) { //Shift rear 4 points to rear z of cube
+                vertices[pointlist[i]] = vertices[pointlist[i]].add(Vector4(0, 0, scene.models[j].depth / 2, 0));
+            }
+            edges[0] = [0, 1, 2, 3];
+            edges[1] = [4, 5, 6, 7];
+            for (i = 0; i < 4; i++) {
+                edges[i + 2] = [edges[0][i], edges[1][i]];
+            }
+            console.log(vertices);
+            console.log(edges);
+            scene.models[j] = {...scene.models[j], ...vertices};
+            scene.models[j] = {...scene.models[j], ...edges};
+            console.log("inside cube");
+            console.log(scene.models[j]);
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////////////////////
 // No need to edit functions beyond this point
 ///////////////////////////////////////////////////////////////////////////
@@ -554,6 +586,8 @@ function loadNewScene() {
         scene.view.vup = Vector3(scene.view.vup[0], scene.view.vup[1], scene.view.vup[2]);
 
         for (let i = 0; i < scene.models.length; i++) {
+            console.log("loadscene");
+            console.log(scene.models.length);
             if (scene.models[i].type === 'generic') {
                 for (let j = 0; j < scene.models[i].vertices.length; j++) {
                     scene.models[i].vertices[j] = Vector4(scene.models[i].vertices[j][0],
@@ -570,6 +604,8 @@ function loadNewScene() {
             }
             scene.models[i].matrix = new Matrix(4, 4);
         }
+        generateGenericModels();
+        window.requestAnimationFrame(animate);
     };
     reader.readAsText(scene_file.files[0], 'UTF-8');
 }
