@@ -85,7 +85,7 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    window.requestAnimationFrame(animate);
+    //window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
@@ -564,6 +564,117 @@ function generateGenericModels() {
             scene.models[j].edges = edges;
             console.log("inside cube");
             console.log(scene.models[j]);
+        } else if (scene.models[j].type === 'cylinder'){
+            let vertices = [];
+            let edges = [];
+            edges[0]=[0, 0];
+            edges[1]=[0, 0];
+            let theta = 0;
+            let increment = 2*Math.PI/scene.models[j].sides;
+            let thispoint = {x:scene.models[j].center.x+scene.models[j].radius, z:scene.models[j].center.z};
+            let nextpoint = {x:0,z:0};
+            for (let i=0; i<scene.models[j].sides; i++){
+                theta = theta + increment;
+                nextpoint.x=scene.models[j].center.x+scene.models[j].radius*Math.cos(theta);
+                nextpoint.z=scene.models[j].center.z+scene.models[j].radius*Math.sin(theta);
+                thispoint = {x:nextpoint.x, z:nextpoint.z};
+                vertices[i] = Vector4(thispoint.x, scene.models[j].center.y-(scene.models[j].height/2), thispoint.z, 1);
+                vertices[i+scene.models[j].sides] = Vector4(thispoint.x, scene.models[j].center.y+(scene.models[j].height/2), thispoint.z, 1);
+                edges[0][i]=i;
+                edges[1][i]=scene.models[j].sides+i;
+                edges[i + 2] = [edges[0][i], edges[1][i]];
+            }
+            edges[0][scene.models[j].sides]=0;
+            edges[1][scene.models[j].sides]=scene.models[j].sides
+            console.log(vertices);
+            console.log(edges);
+            scene.models[j].vertices = vertices;
+            scene.models[j].edges = edges;
+            console.log("inside cylinder");
+            console.log(scene.models[j]);
+        } else if (scene.models[j].type === 'cone'){
+            let vertices = [];
+            let edges = [];
+            edges[0]=[0, 0];
+            let theta = 0;
+            let increment = 2*Math.PI/scene.models[j].sides;
+            let thispoint = {x:scene.models[j].center.x+scene.models[j].radius, z:scene.models[j].center.z};
+            let nextpoint = {x:0,z:0};
+            for (let i=0; i<scene.models[j].sides; i++){
+                theta = theta + increment;
+                nextpoint.x=scene.models[j].center.x+scene.models[j].radius*Math.cos(theta);
+                nextpoint.z=scene.models[j].center.z+scene.models[j].radius*Math.sin(theta);
+                thispoint = {x:nextpoint.x, z:nextpoint.z};
+                vertices[i] = Vector4(thispoint.x, scene.models[j].center.y, thispoint.z, 1);
+                edges[0][i]=i;
+                edges[i + 1] = [edges[0][i], scene.models[j].sides];
+            }
+            vertices[scene.models[j].sides] = Vector4(scene.models[j].center.x, scene.models[j].center.y+scene.models[j].height, scene.models[j].center.z, 1)
+            edges[0][scene.models[j].sides]=0;
+            console.log(vertices);
+            console.log(edges);
+            scene.models[j].vertices = vertices;
+            scene.models[j].edges = edges;
+            console.log("inside cone");
+            console.log(scene.models[j]);
+        } else if (scene.models[j].type === 'sphere'){
+            let vertices = [];
+            let edges = [];
+            let theta = 0;
+            let thetaIncrement = 2*Math.PI/scene.models[j].slices;
+            let phi = 0;
+            let phiIncrement = Math.PI/scene.models[j].stacks;
+            vertices[0] = scene.models[j].center.add(Vector4(scene.models[j].radius*Math.cos(theta)*Math.cos(phi), scene.models[j].radius*Math.cos(phi), scene.models[j].radius*Math.sin(theta)*Math.sin(phi), 0));
+            for (let k=1; k<scene.models[j].stacks; k++){
+                edges[k-1]=[0, 0];
+                phi = phi+phiIncrement;
+                for (let i=0; i<scene.models[j].slices; i++){
+                    theta = theta+thetaIncrement;
+                    vertices[(k-1)*scene.models[j].slices+i+1] = scene.models[j].center.add(Vector4(scene.models[j].radius*Math.cos(theta)*Math.cos(phi), scene.models[j].radius*Math.cos(phi), scene.models[j].radius*Math.sin(theta)*Math.sin(phi), 0));
+                    edges[k-1][i]=(k-1)*scene.models[j].slices+i+1;
+                }
+                edges[k-1][scene.models[j].slices] = (k-1)*scene.models[j].slices+1;
+            }
+            phi = phi+phiIncrement;
+            vertices[vertices.length] = scene.models[j].center.add(Vector4(scene.models[j].radius*Math.cos(theta)*Math.cos(phi), scene.models[j].radius*Math.cos(phi), scene.models[j].radius*Math.sin(theta)*Math.sin(phi), 0));
+            for (i=0; i<scene.models[j].stacks; i++){
+                edges[scene.models[j].stacks+i]=[0, 0];
+                edges[scene.models[j].stacks+i][i+1]
+            }
+
+            /*
+            edges[0]=[0, 0];
+            let theta = 0;
+            let increment = 2*Math.PI/scene.models[j].slices;
+            let stackTheta = 0;
+            let stackIncrement = Math.PI/scene.models[j].stacks;
+            let thispoint = {x:scene.models[j].center.x+scene.models[j].radius, z:scene.models[j].center.z};
+            vertices[0] = Vector4(scene.models[j].center.x, scene.models[j].center.y-scene.models[j].radius, scene.models[j].center.z, 1); //Point at bottom of sphere
+            for (let k=1; k<scene.models[j].stacks-1; k++){
+                edges[0]=[0, 0];
+                stackTheta = stackTheta + stackIncrement;
+                thispoint = Vector4(scene.models[j].center.x+scene.models[j].radius*Math.cos(stackTheta), scene.models[j].center.y-scene.models[j].radius+scene.models[j].radius*Math.sin(stackTheta), scene.models[j].center.z, 1);
+                console.log(thispoint);
+                for (let i=0; i<scene.models[j].slices; i++){
+                    theta = theta + increment;
+                    thispoint.x=scene.models[j].center.x+scene.models[j].radius*Math.cos(theta);
+                    thispoint.z=scene.models[j].center.z+scene.models[j].radius*Math.sin(theta);
+                    vertices[(k-1)*scene.models[j].slices+i+1] = Vector4(thispoint.x, thispoint.y, thispoint.z, 1);
+                    edges[k-1][i]=(k-1)*scene.models[j].slices+i+1;
+                    //edges[i + 2] = [edges[0][i], edges[1][i]];
+                }
+                edges[k-1][scene.models[j].slices] = (k-1)*scene.models[j].slices+1;
+            }
+            */
+
+
+
+            console.log(vertices);
+            console.log(edges);
+            scene.models[j].vertices = vertices;
+            scene.models[j].edges = edges;
+            console.log("inside sphere");
+            console.log(scene.models[j]);
         }
     }
 }
@@ -605,7 +716,7 @@ function loadNewScene() {
             scene.models[i].matrix = new Matrix(4, 4);
         }
         generateGenericModels();
-        //window.requestAnimationFrame(animate);
+        window.requestAnimationFrame(animate);
     };
     reader.readAsText(scene_file.files[0], 'UTF-8');
 }
