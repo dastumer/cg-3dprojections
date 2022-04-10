@@ -85,7 +85,7 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    //window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
@@ -553,15 +553,15 @@ function generateGenericModels() {
             for (i = 0; i < 4; i++) { //Shift rear 4 points to rear z of cube
                 vertices[pointlist[i]] = vertices[pointlist[i]].add(Vector4(0, 0, scene.models[j].depth / 2, 0));
             }
-            edges[0] = [0, 1, 2, 3];
-            edges[1] = [4, 5, 6, 7];
+            edges[0] = [0, 1, 2, 3, 0];
+            edges[1] = [4, 5, 6, 7, 4];
             for (i = 0; i < 4; i++) {
                 edges[i + 2] = [edges[0][i], edges[1][i]];
             }
             console.log(vertices);
             console.log(edges);
-            scene.models[j] = {...scene.models[j], ...vertices};
-            scene.models[j] = {...scene.models[j], ...edges};
+            scene.models[j].vertices = vertices;
+            scene.models[j].edges = edges;
             console.log("inside cube");
             console.log(scene.models[j]);
         }
@@ -605,7 +605,7 @@ function loadNewScene() {
             scene.models[i].matrix = new Matrix(4, 4);
         }
         generateGenericModels();
-        window.requestAnimationFrame(animate);
+        //window.requestAnimationFrame(animate);
     };
     reader.readAsText(scene_file.files[0], 'UTF-8');
 }
