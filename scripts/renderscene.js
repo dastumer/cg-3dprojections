@@ -85,7 +85,7 @@ function animate(timestamp) {
     // step 4: request next animation frame (recursively calling same function)
     // (may want to leave commented out while debugging initially)
 
-    //window.requestAnimationFrame(animate);
+    window.requestAnimationFrame(animate);
 }
 
 // Main drawing code - use information contained in variable `scene`
@@ -469,7 +469,7 @@ function onKeyDown(event) {
     uUnit.normalize();
 
     let vUnit = nUnit.cross(uUnit);
-    let theta = Math.PI/8;
+    let theta = Math.PI/16;
     let rotationMatrix = new Matrix(3,3);
 
     switch (event.keyCode) {
@@ -481,7 +481,9 @@ function onKeyDown(event) {
                                     [vUnit.z*vUnit.x*(1-Math.cos(theta))-vUnit.y*Math.sin(theta), vUnit.z*vUnit.y*(1-Math.cos(theta))+vUnit.x*Math.sin(theta), Math.cos(theta)+Math.pow(vUnit.z,2)*(1-Math.cos(theta))]];
             
             //scene.view.prp = Matrix.multiply([rotationMatrix, scene.view.prp]);
+            scene.view.srp = scene.view.srp.subtract(scene.view.prp);
             scene.view.srp = Matrix.multiply([rotationMatrix, scene.view.srp]);
+            scene.view.srp = scene.view.srp.add(scene.view.prp);
 
             break;
         case 39: // RIGHT Arrow
@@ -493,7 +495,9 @@ function onKeyDown(event) {
                                     [vUnit.z*vUnit.x*(1-Math.cos(theta))-vUnit.y*Math.sin(theta), vUnit.z*vUnit.y*(1-Math.cos(theta))+vUnit.x*Math.sin(theta), Math.cos(theta)+Math.pow(vUnit.z,2)*(1-Math.cos(theta))]];
             
             //scene.view.prp = Matrix.multiply([rotationMatrix, scene.view.prp]);
+            scene.view.srp = scene.view.srp.subtract(scene.view.prp);
             scene.view.srp = Matrix.multiply([rotationMatrix, scene.view.srp]);
+            scene.view.srp = scene.view.srp.add(scene.view.prp);
 
             break;
         case 65: // A key
@@ -716,7 +720,7 @@ function loadNewScene() {
             scene.models[i].matrix = new Matrix(4, 4);
         }
         generateGenericModels();
-        window.requestAnimationFrame(animate);
+        //window.requestAnimationFrame(animate);
     };
     reader.readAsText(scene_file.files[0], 'UTF-8');
 }
