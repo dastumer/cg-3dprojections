@@ -9,7 +9,7 @@ TODO:
 * [x] Projection
 * [x] Draw Lines
 * [x] WASD Movement
-* [] Arrow Key Rotation
+* [x] Arrow Key Rotation
 //
 * Parallel
 //
@@ -20,9 +20,9 @@ TODO:
 * [x] WASD Movement
 * [] Arrow Key Rotation
 //
-* [] Common Models
+* [x] Common Models
 //
-* [] Model Rotation
+* [x] Model Rotation
 
 //
 //

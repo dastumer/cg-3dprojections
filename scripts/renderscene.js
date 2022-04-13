@@ -77,7 +77,26 @@ function animate(timestamp) {
     let time = timestamp - start_time;
     
     // step 2: transform models based on time
-    // TODO: implement this!
+    //console.log(theta);
+    scene.models.forEach(model => {
+        if (model.animation!=null){
+            let theta = time*2*Math.PI*model.animation.rps/1000; //model.animation.rps * 2 * Math.PI * time; //Degrees in radians the model must be transformed from original position at current time
+            if (model.animation.axis === 'x'){
+                Mat4x4RotateX(model.matrix, theta);
+            } else if (model.animation.axis === 'y'){
+                Mat4x4RotateY(model.matrix, theta);
+            } else if (model.animation.axis === 'z'){
+                Mat4x4RotateZ(model.matrix, theta);
+            }
+            if (model.animation.axis!=null & model.animation.center === 'y'){
+                let negativePRPTranslateMatrix = new Matrix(4, 4);
+                Mat4x4Translate(negativePRPTranslateMatrix, -model.center.x, -model.center.y, -model.center.z);
+                let positivePRPTranslateMatrix = new Matrix(4, 4);
+                Mat4x4Translate(positivePRPTranslateMatrix, model.center.x, model.center.y, model.center.z);
+                model.matrix = Matrix.multiply([positivePRPTranslateMatrix, model.matrix, negativePRPTranslateMatrix]);
+            }
+        }
+    });
 
     // step 3: draw scene
     drawScene();
@@ -90,7 +109,7 @@ function animate(timestamp) {
 
 // Main drawing code - use information contained in variable `scene`
 function drawScene() {
-    console.log(scene);
+    //console.log(scene);
     
     let transformMatrix;
     let projectionMatrix;
@@ -624,6 +643,75 @@ function generateGenericModels() {
         } else if (scene.models[j].type === 'sphere'){
             let vertices = [];
             let edges = [];
+            let theta = Math.PI/2;
+            let increment = Math.PI/scene.models[j].stacks;
+            let sliceTheta = 0;
+            let sliceIncrement = 2*Math.PI/scene.models[j].slices;
+            let rotationMatrix = new Matrix(4,4);
+            let thispoint = Vector4(scene.models[j].center.x, scene.models[j].center.y-scene.models[j].radius, scene.models[j].center.z, 1); //Point at bottom of sphere
+            for (let i = 0; i < scene.models[j].stacks+1; i++) {
+                thispoint.x = scene.models[j].center.x + scene.models[j].radius * Math.cos(theta);
+                thispoint.y = scene.models[j].center.y + scene.models[j].radius * Math.sin(theta);
+                sliceTheta=0;
+                for (let k=0; k<scene.models[j].slices; k++){
+                    edges[k]=[0, 0];
+                    Mat4x4RotateY(rotationMatrix, sliceTheta);
+                    vertices[(k) * (scene.models[j].stacks + 1) + i] = scene.models[j].center.add(Matrix.multiply([rotationMatrix, Vector4(thispoint.x, thispoint.y, thispoint.z, 1).subtract(scene.models[j].center)]));
+                    sliceTheta = sliceTheta + sliceIncrement;
+                }
+                theta = theta + increment;
+            }
+            for (k=0; k<scene.models[j].slices; k++){
+                for (i = 0; i < scene.models[j].stacks+1; i++) {
+                    edges[k][i] = (k) * (scene.models[j].stacks+1) + i;
+                }
+            }
+            for (k=0; k<scene.models[j].stacks; k++){
+                edges[k+scene.models[j].slices] = [0, 0];
+                for (i = 0; i < scene.models[j].slices; i++) {
+                    edges[k+scene.models[j].slices][i] = edges[i][k];
+                }
+                edges[k+scene.models[j].slices][scene.models[j].slices] = edges[k+scene.models[j].slices][0]
+            }
+            
+            console.log(vertices);
+            console.log(edges);
+            scene.models[j].vertices = vertices;
+            scene.models[j].edges = edges;
+            console.log("inside sphere");
+            console.log(scene.models[j]);
+        } else if (scene.models[j].type === 'spiral'){
+            let vertices = [];
+            let edges = [];
+            edges[0]=[0, 0];
+            let theta = 0;
+            let increment = Math.PI/scene.models[j].stacks;
+            let sliceTheta = 0;
+            let sliceIncrement = 2*Math.PI/scene.models[j].slices;
+            let rotationMatrix = new Matrix(4,4);
+            let thispoint = Vector4(scene.models[j].center.x, scene.models[j].center.y-scene.models[j].radius, scene.models[j].center.z, 1); //Point at bottom of sphere
+            for (let i = 0; i < scene.models[j].stacks * 2; i++) {
+                theta = theta + increment;
+                thispoint.x = scene.models[j].center.x + scene.models[j].radius * Math.cos(theta);
+                thispoint.y = scene.models[j].center.z + scene.models[j].radius * Math.sin(theta);
+                for (let k=0; k<1; k++){
+                    Mat4x4RotateY(rotationMatrix, sliceTheta);
+                    vertices[(k) * scene.models[j].slices + i] = Matrix.multiply([rotationMatrix, Vector4(thispoint.x, thispoint.y, thispoint.z, 1)]);
+                    edges[k][i] = (k) * scene.models[j].slices + i;
+                    sliceTheta = sliceTheta + sliceIncrement;
+                    edges[k][scene.models[j].stacks * 2] = (k) * scene.models[j].slices;
+                }
+            }
+            
+            console.log(vertices);
+            console.log(edges);
+            scene.models[j].vertices = vertices;
+            scene.models[j].edges = edges;
+            console.log("inside spiral");
+            console.log(scene.models[j]);
+        } else if (scene.models[j].type === 'sploob'){
+            let vertices = [];
+            let edges = [];
             let theta = 0;
             let thetaIncrement = 2*Math.PI/scene.models[j].slices;
             let phi = 0;
@@ -645,39 +733,11 @@ function generateGenericModels() {
                 edges[scene.models[j].stacks+i]=[0, 0];
                 edges[scene.models[j].stacks+i][i+1]
             }
-
-            /*
-            edges[0]=[0, 0];
-            let theta = 0;
-            let increment = 2*Math.PI/scene.models[j].slices;
-            let stackTheta = 0;
-            let stackIncrement = Math.PI/scene.models[j].stacks;
-            let thispoint = {x:scene.models[j].center.x+scene.models[j].radius, z:scene.models[j].center.z};
-            vertices[0] = Vector4(scene.models[j].center.x, scene.models[j].center.y-scene.models[j].radius, scene.models[j].center.z, 1); //Point at bottom of sphere
-            for (let k=1; k<scene.models[j].stacks-1; k++){
-                edges[0]=[0, 0];
-                stackTheta = stackTheta + stackIncrement;
-                thispoint = Vector4(scene.models[j].center.x+scene.models[j].radius*Math.cos(stackTheta), scene.models[j].center.y-scene.models[j].radius+scene.models[j].radius*Math.sin(stackTheta), scene.models[j].center.z, 1);
-                console.log(thispoint);
-                for (let i=0; i<scene.models[j].slices; i++){
-                    theta = theta + increment;
-                    thispoint.x=scene.models[j].center.x+scene.models[j].radius*Math.cos(theta);
-                    thispoint.z=scene.models[j].center.z+scene.models[j].radius*Math.sin(theta);
-                    vertices[(k-1)*scene.models[j].slices+i+1] = Vector4(thispoint.x, thispoint.y, thispoint.z, 1);
-                    edges[k-1][i]=(k-1)*scene.models[j].slices+i+1;
-                    //edges[i + 2] = [edges[0][i], edges[1][i]];
-                }
-                edges[k-1][scene.models[j].slices] = (k-1)*scene.models[j].slices+1;
-            }
-            */
-
-
-
             console.log(vertices);
             console.log(edges);
             scene.models[j].vertices = vertices;
             scene.models[j].edges = edges;
-            console.log("inside sphere");
+            console.log("inside sploob");
             console.log(scene.models[j]);
         }
     }

@@ -21,8 +21,9 @@
             "height": 5,
             "sides": 12,
             "animation": {
-                "axis": "y",
-                "rps": 0.5
+                "axis": "x",
+                "rps": 0.5,
+                "center": "y"
             }
         },
         {
@@ -33,18 +34,20 @@
             "sides": 12,
             "animation": {
                 "axis": "y",
-                "rps": 0.5
+                "rps": 0.5,
+                "center": "n"
             }
         },
         {
             "type": "sphere",
-            "center": [30, 0, -10],
+            "center": [1, -5, -10],
             "radius": 3,
             "slices": 12,
             "stacks": 12,
             "animation": {
-                "axis": "y",
-                "rps": 0.5
+                "axis": "z",
+                "rps": 0.5,
+                "center": "n"
             }
         }
     ]
